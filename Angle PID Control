@@ -1,0 +1,48 @@
+from simple_pid import PID
+import time
+import matplotlib.pyplot as plt
+
+#Initialize Kp, Ki and Kd values
+Kp = 1
+Ki = 1
+Kd = 1
+
+#Define Smartderm Class
+class smartderm:
+    def __init__(self):
+        self.angle = 0
+    def update(self, control):
+        if control > 0:
+            self.angle += 5
+        else:
+            self.angle -= 5
+        return self.angle
+if __name__ == '__main__':
+    sys = smartderm()
+    angle = sys.angle
+    pid = PID(Kp, Ki, Kd, setpoint = angle)
+    pid.output_limits = (0, 30)
+    start_time = time.time()
+    last_time = start_time
+    setpoint, t, omega = [], [], []
+    for i in range (0,100,1):
+        current_time = time.time()
+        dt = (current_time - last_time)
+        control = pid(angle)
+        angle = sys.update(control)
+        # Visualize Output Results
+        t += [current_time - start_time] #create list for time variable
+        omega += [angle] #create list for temperature variable
+        setpoint += [pid.setpoint] #create setpoint constant
+        # Used for initial value assignment of variable temp
+        if current_time - start_time > 0:
+            pid.setpoint = 30 #set setpoint
+        last_time = current_time
+
+    # Visualization of Output Results
+    plt.plot(t, setpoint, label='target')
+    plt.plot(t, omega, label='PID')
+    plt.xlabel('time')
+    plt.ylabel('angle')
+    plt.legend()
+    plt.show()
