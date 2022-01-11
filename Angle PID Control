@@ -1,6 +1,7 @@
 nano ~/accelerometer.py
 from simple_pid import PID
 import time
+import math
 import matplotlib.pyplot as plt
 
 #Importing libraries for Accelerometer Reading 
@@ -20,11 +21,22 @@ run = True
 class smartderm:
     def __init__(self):
         i2c=busio.I2C(board.SCL,board.SDA)
-        accelerometer = adafruit_adxl34x.ADXL345(i2c)
         self.accelerometer = adafruit_adxl34x.ADXL345(i2c) #Instantiate the ADXL345 library into accelerometer module
     def angle(self):
         print("%f %f %f"%self.angle.accelerometer) #Need to figure out what kind of output this yields, Accelerometer may yield 3 positional data: X, Y and Z 
-        return self.accelerometer
+        ### If self.accelerometer yieds x, y, z values, proceed with this ###
+        xyz_angle = []
+        x_acc=self.accelerometer[0]
+        y_acc=self.accelerometer[0]
+        z_acc=self.accelerometer[0]
+        x_rad = math.atan2(x, math.sqrt((y_acc*y_acc)+(z_acc*z_acc)
+        y_rad = math.atan2(y, math.sqrt((x_acc*y_acc)+(z_acc*z_acc)
+        z_rad = math.atan2(z, math.sqrt((x_acc*y_acc)+(y_acc*z_acc)
+        xyz_angle.append(x_rad)
+        xyz_angle.append(y_rad)
+        xyz_angle.append(z_rad)
+        ### There are 3 angles here. Which value should we use as input ###
+        return self.angle_input
     def update(self, control,dt):
         try: 
             if control_output > 0: #Why greater than 0? Find out 
