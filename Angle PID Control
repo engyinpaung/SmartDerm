@@ -1,28 +1,43 @@
+nano ~/accelerometer.py
 from simple_pid import PID
 import time
 import matplotlib.pyplot as plt
 
+#Importing libraries for Accelerometer Reading 
+import board #Adafruit's board library
+import busio
+import adafruit_adxl34x
+
+#Importing Raspberry Pi
+import RPi.GPIO as GPIO
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+pin_list=(18.23)
+
 run = True 
-class pressure: 
-    def__init__(self): 
-#Insert Bluetooth module retrieving data from sensors (From Vinith) 
-    self.pressure_mat = #pressure matrix 
-
-#Insert Raspberry Pi  
-
 
 #Define Smartderm Class
 class smartderm:
     def __init__(self):
-        self.angle = 0 #Need data from accelerometer 
-        self.pressure = [] #Need data from FSR 
+        i2c=busio.I2C(board.SCL,board.SDA)
+        accelerometer = adafruit_adxl34x.ADXL345(i2c)
+        self.accelerometer = adafruit_adxl34x.ADXL345(i2c) #Instantiate the ADXL345 library into accelerometer module
+    def angle(self):
+        print("%f %f %f"%self.angle.accelerometer) #Need to figure out what kind of output this yields, Accelerometer may yield 3 positional data: X, Y and Z 
+        return self.accelerometer
     def update(self, control,dt):
         try: 
             if control_output > 0: #Why greater than 0? Find out 
                 self.angle += 0.5*dt #Revise this with Smartderm team
-                #Insert relay switch code 
+                #Check with Daniel if this just switches on and off 
+                GPIO.setup(pin_list,GPIO.OUT)
+                GPIO.setup(pin_list,GPIO.LOW)
+                time.sleep(1)
+                GPIO.output(pin_list,GPIO.HIGH)
+                GPIO.cleanup()
             else:
                 self.angle -= 30*dt
+                #Need to turn off relay here too. 
         except:
             pass
         return self.angle
@@ -39,13 +54,14 @@ class pid_ctl(PID):
     def __init__(self,input,control_var) 
         if control_var == 'angle': 
             super().__init__(Kp='Kp_angle',Ki='Ki_angle',Kd='Kd_angle',setpoint='sp_angle')
-            self.input = #measurements from accelerometer 
+            self.input = smartderm.angle() #Need to determine angle input from accelerometer data
         elif control_var == 'pressure': 
             super().__init__(Kp='Kp_pressure',Ki='Ki_pressure',Kd='Kd_pressure',setpoint='sp_pressure')
             self.input = #measurements from FSR 
         else: 
             return None 
     def pid_plot():
+        #Revise code 
         current_time = time.time() 
         t += [current_time - start_time] #create list for time variable
         omega += [control_var] #create list for ctl variable
@@ -58,21 +74,17 @@ class pid_ctl(PID):
         plt.ylabel(control_var)
         plt.legend()
         plt.show()
-    def init_pressure(self):
-        #Obtain pressure matrix and find the gradient of matrix
-        #If gradient >> 0, interrupt control loop sequence and modulate pressure (patient returns to supine position and then turn opposite way) 
-        #If gradient ~= 0, pass 
 if __name__ == '__main__':
-    input = smartderm()
+    sys_input = smartderm()
+    a_input = smartderm.angle() 
     time_delta = start.time() + 60 * 15 #1 hour spent in each orientation 
     while run = True:
-        control = pid_ctl(input,control_var)
+        control = pid_ctl(a_input,control_var)
         # Compute new output from the PID according to the systems current value
         output = control(input)
         # Feed the PID output to the system and get its current value
         output_update = controlled_system.update(output)
         while start_time - current_time < time_delta: #runs for 1 hour
-            pid_setpoint = setpoint[1]
-            sys_pid = pid_loop(pid_setpoint)
+            
 
    
