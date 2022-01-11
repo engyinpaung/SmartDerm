@@ -1,47 +1,90 @@
+nano ~/accelerometer.py
 from simple_pid import PID
 import time
 import matplotlib.pyplot as plt
 
-#Initialize Kp, Ki and Kd values
-Kp = 10
-Ki = 10
-Kd = 10
+#Importing libraries for Accelerometer Reading 
+import board #Adafruit's board library
+import busio
+import adafruit_adxl34x
+
+#Importing Raspberry Pi
+import RPi.GPIO as GPIO
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+pin_list=(18.23)
+
+run = True 
 
 #Define Smartderm Class
 class smartderm:
     def __init__(self):
-        self.angle = 0
+        i2c=busio.I2C(board.SCL,board.SDA)
+        accelerometer = adafruit_adxl34x.ADXL345(i2c)
+        self.accelerometer = adafruit_adxl34x.ADXL345(i2c) #Instantiate the ADXL345 library into accelerometer module
+    def angle(self):
+        print("%f %f %f"%self.angle.accelerometer) #Need to figure out what kind of output this yields, Accelerometer may yield 3 positional data: X, Y and Z 
+        return self.accelerometer
     def update(self, control,dt):
-        if control > 0:
-            self.angle += 0.5*dt #Revise this with Smartderm team
-        else:
-            self.angle -= 30*dt
+        try: 
+            if control_output > 0: #Why greater than 0? Find out 
+                self.angle += 0.5*dt #Revise this with Smartderm team
+                #Check with Daniel if this just switches on and off 
+                GPIO.setup(pin_list,GPIO.OUT)
+                GPIO.setup(pin_list,GPIO.LOW)
+                time.sleep(1)
+                GPIO.output(pin_list,GPIO.HIGH)
+                GPIO.cleanup()
+            else:
+                self.angle -= 30*dt
+                #Need to turn off relay here too. 
+        except:
+            pass
         return self.angle
-if __name__ == '__main__':
-    sys = smartderm()
-    angle = sys.angle
-    pid = PID(Kp, Ki, Kd, setpoint = 30) #Set up PID control, might have to define a negative/positive value for L & R
-    pid.output_limits = (-30, 30)
-    start_time = time.time()
-    last_time = start_time
-    setpoint, t, omega = [], [], []
-    for i in range (0,1000,1):
-        pid.setpoint = 30
-        current_time = time.time()
-        dt = (current_time - last_time)
-        control = pid(angle) #Figure out what this does
-        angle = sys.update(control,dt)
-        # Visualize Output Results
+class pid_ctl(PID): 
+    machine = True
+    Kp_angle = 10
+    Ki_angle = 10
+    Kd_angle = 10
+    sp_angle = 30
+    Kp_pressure = 10
+    Ki_pressure = 10
+    Kd_pressure = 10
+    sp_pressure = 30
+    def __init__(self,input,control_var) 
+        if control_var == 'angle': 
+            super().__init__(Kp='Kp_angle',Ki='Ki_angle',Kd='Kd_angle',setpoint='sp_angle')
+            self.input = smartderm.angle() #Need to determine angle input from accelerometer data
+        elif control_var == 'pressure': 
+            super().__init__(Kp='Kp_pressure',Ki='Ki_pressure',Kd='Kd_pressure',setpoint='sp_pressure')
+            self.input = #measurements from FSR 
+        else: 
+            return None 
+    def pid_plot():
+        #Revise code 
+        current_time = time.time() 
         t += [current_time - start_time] #create list for time variable
-        omega += [angle] #create list for temperature variable
-        setpoint += [pid.setpoint] #create setpoint constant
-        # Used for initial value assignment of variable temp
+        omega += [control_var] #create list for ctl variable
+        sp_tuple += [setpoint] #create setpoint constant
         last_time = current_time
+        # Visualization of Output Results
+        plt.plot(t, sp_tuple, label='target')
+        plt.plot(t, omega, label='PID')
+        plt.xlabel('time')
+        plt.ylabel(control_var)
+        plt.legend()
+        plt.show()
+if __name__ == '__main__':
+    sys_input = smartderm()
+    a_input = smartderm.angle() 
+    time_delta = start.time() + 60 * 15 #1 hour spent in each orientation 
+    while run = True:
+        control = pid_ctl(a_input,control_var)
+        # Compute new output from the PID according to the systems current value
+        output = control(input)
+        # Feed the PID output to the system and get its current value
+        output_update = controlled_system.update(output)
+        while start_time - current_time < time_delta: #runs for 1 hour
+            
 
-    # Visualization of Output Results
-    plt.plot(t, setpoint, label='target')
-    plt.plot(t, omega, label='PID')
-    plt.xlabel('time')
-    plt.ylabel('angle')
-    plt.legend()
-    plt.show()
+   
