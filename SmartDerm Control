@@ -3,6 +3,7 @@ from simple_pid import PID
 import time
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 #Importing libraries for Accelerometer Reading 
 import board #Adafruit's board library
@@ -37,6 +38,9 @@ class smartderm:
         xyz_angle.append(z_rad)
         ### There are 3 angles here. Which value should we use as input ###
         return self.angle_input
+    def pressure(self): 
+        pressure_matrix = np.random.rand(12, 4)
+        pmatrix_gradient = np.gradient(f,x) #What am I differentiating with respect to? 
     def update(self, control,dt):
         try: 
             if control_output > 0: #Why greater than 0? Find out 
