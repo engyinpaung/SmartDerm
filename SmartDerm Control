@@ -39,8 +39,10 @@ class smartderm:
         ### There are 3 angles here. Which value should we use as input ###
         return self.angle_input
     def pressure(self): 
-        pressure_matrix = np.random.rand(12, 4)
-        pmatrix_gradient = np.gradient(f,x) #What am I differentiating with respect to? 
+        pressure_matrix1 = np.random.rand(12, 4)
+        time.sleep(5) #Need this to calculate pressure gradient with respect to time
+        pressure_matrix2 = np.random.rand(12, 4) 
+        pressure_gradient = np.gradient(pressure_matrix1,pressure_matrix2)
     def update(self, control,dt):
         try: 
             if control_output > 0: #Why greater than 0? Find out 
